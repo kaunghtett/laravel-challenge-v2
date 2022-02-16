@@ -4,29 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Services\InternetServiceProvider\Mpt;
 use App\Services\InternetServiceProvider\Ooredoo;
+use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
 
 class InternetServiceProviderController extends Controller
 {
+    use ApiResponser;
+
     public function getMptInvoiceAmount(Request $request)
     {
-        $mpt = new Mpt();
-        $mpt->setMonth($request->get('month') ?: 1);
-        $amount = $mpt->calculateTotalAmount();
-        
-        return response()->json([
-            'data' => $amount
-        ]);
+        $amount = $this->invoiceAmount(new Mpt(), $request->get('month'));
+       
+        return $this->successResponse($amount,"success");
     }
     
     public function getOoredooInvoiceAmount(Request $request)
     {
-        $ooredoo = new Ooredoo();
-        $ooredoo->setMonth($request->get('month') ?: 1);
-        $amount = $ooredoo->calculateTotalAmount();
-        
-        return response()->json([
-            'data' => $amount
-        ]);
+        $amount = $this->invoiceAmount(new Ooredoo(), $request->get('month'));
+        return $this->successResponse($amount,"success");
+    }
+
+    public static function invoiceAmount($service, $month = 1) {
+        $service->setMonth($month);
+        $amount = $service->calculateTotalAmount();
+        return $amount;
     }
 }
