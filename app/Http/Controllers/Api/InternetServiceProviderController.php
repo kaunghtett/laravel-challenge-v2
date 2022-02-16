@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Services\InternetServiceProvider\Mpt;
 use App\Services\InternetServiceProvider\Ooredoo;
 use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class InternetServiceProviderController extends Controller
 {

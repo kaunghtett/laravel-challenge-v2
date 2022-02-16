@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\InternetServiceProviderController;
-use App\Http\Controllers\JobController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\PostController;
-use App\Http\Controllers\StaffController;
+use App\Http\Controllers\Api\InternetServiceProviderController;
+use App\Http\Controllers\Api\JobController;
+use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\StaffController;
 use Illuminate\Support\Facades\Route;
 
 /*

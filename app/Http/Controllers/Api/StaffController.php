@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Services\EmployeeManagement\Employee;
 use App\Traits\ApiResponser;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
-class JobController extends Controller
+class StaffController extends Controller
 {
     use ApiResponser;
     protected $employee;
@@ -16,10 +16,10 @@ class JobController extends Controller
         $this->employee = $employee;
     }
     
-    public function apply(Request $request)
+    public function payroll()
     {
-        $data = $this->employee->applyJob();
-        
+        $data = $this->employee->salary();
+    
         return $this->successResponse($data,"success");
     }
 }
