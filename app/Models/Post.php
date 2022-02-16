@@ -14,6 +14,8 @@ class Post extends Model
         'description',
         'author_id'
     ];
+
+    protected $with = ['tags','likes'];
     
     public function tags()
     {

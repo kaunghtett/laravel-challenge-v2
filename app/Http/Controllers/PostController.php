@@ -2,77 +2,60 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\PostReactionRequest;
+use App\Http\Resources\PostResource;
 use App\Models\Like;
 use App\Models\Post;
+use App\Services\Post\Post as PostService;
+use App\Traits\ApiResponser;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PostController extends Controller
 {
+    use ApiResponser;
+    
     public function list()
     {
-        $posts = Post::get();
-        
-        $data = collect();
-        foreach ($posts as $post) {
-            $data->add([
-                'id'          => $post->id,
-                'title'       => $post->title,
-                'description' => $post->description,
-                'tags'        => $post->tags,
-                'like_counts' => $post->likes->count(),
-                'created_at'  => $post->created_at,
-            ]);
+        try {
+            $posts = Post::get();  //eagerload in model
+            return PostResource::collection($posts);
         }
-        return response()->json([
-            'data' => $data,
-        ]);
+        catch (Exception $e) {
+            return $this->apiExceptionResponse($e);
+        }
     }
     
-    public function toggleReaction(Request $request)
+    public function toggleReaction(PostReactionRequest $request)
     {
-        $request->validate([
-            'post_id' => 'required|int|exists:posts,id',
-            'like'   => 'required|boolean'
-        ]);
         
-        $post = Post::find($request->post_id);
-        if(!$post) {
-            return response()->json([
-                'status' => 404,
-                'message' => 'model not found'
-            ]);
-        }
-        
-        if($post->user_id == auth()->id()) {
-            return response()->json([
-                'status' => 500,
-                'message' => 'You cannot like your post'
-            ]);
-        }
-        
-        $like = Like::where('post_id', $request->post_id)->where('user_id', auth()->id())->first();
-        if($like && $like->post_id == $request->post_id && $request->like) {
-            return response()->json([
-                'status' => 500,
-                'message' => 'You already liked this post'
-            ]);
-        }elseif($like && $like->post_id == $request->post_id && !$request->like) {
-            $like->delete();
+        try {
+            $post = Post::findOrFail($request->post_id); 
+            if($post->user_id == auth()->id()) {
+                return $this->errorResponse("You cannot like your post",500);
+            }
+            $like = Like::where('post_id', $request->post_id)->where('user_id', auth()->id())->first();
+            if($like && $like->post_id == $request->post_id && $request->like) {
+                
+                return $this->errorResponse('You already like this post',500);
+                
+            }
+            elseif($like && $like->post_id == $request->post_id && !$request->like) {
+                
+                (new PostService())->unLike($like);
+                return $this->successResponse('You unlike this post successfully');
+            }
             
-            return response()->json([
-                'status' => 200,
-                'message' => 'You unlike this post successfully'
-            ]);
+                (new PostService())->setLike($request->post_id);
+            return $this->successResponse(null,"You Succesfully like the post");
+            
+        } catch (ModelNotFoundException $e) {
+            return $this->apiExceptionResponse($e);
         }
         
-        Like::create([
-            'post_id' => $request->post_id,
-            'user_id' => auth()->id()
-        ]);
-        
-        return response()->json([
-            'status' => 200,
-            'message' => 'You like this post successfully'
-        ]);
     }
+    
+    
 }
