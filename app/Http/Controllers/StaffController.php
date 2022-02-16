@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\EmployeeManagement\Staff;
+use App\Services\EmployeeManagement\Employee;
+use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
 
 class StaffController extends Controller
 {
-    protected $staff;
+    use ApiResponser;
+    protected $employee;
     
-    public function __construct(Staff $staff)
+    public function __construct(Employee $employee)
     {
-        $this->staff = $staff;
+        $this->employee = $employee;
     }
     
     public function payroll()
     {
-        $data = $this->staff->salary();
+        $data = $this->employee->salary();
     
-        return response()->json([
-            'data' => $data
-        ]);
+        return $this->successResponse($data,"success");
     }
 }

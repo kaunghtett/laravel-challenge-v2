@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\EmployeeManagement\Applicant;
+use App\Services\EmployeeManagement\Employee;
+use App\Traits\ApiResponser;
 use Illuminate\Http\Request;
 
 class JobController extends Controller
 {
-    protected $applicant;
+    use ApiResponser;
+    protected $employee;
     
-    public function __construct(Applicant $applicant)
+    public function __construct(Employee $employee)
     {
-        $this->applicant = $applicant;
+        $this->employee = $employee;
     }
     
     public function apply(Request $request)
     {
-        $data = $this->applicant->applyJob();
+        $data = $this->employee->applyJob();
         
-        return response()->json([
-            'data' => $data
-        ]);
+        return $this->successResponse($data,"success");
     }
 }

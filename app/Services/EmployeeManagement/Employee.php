@@ -2,9 +2,15 @@
 
 namespace App\Services\EmployeeManagement;
 
-interface Employee
+class Employee implements EmployeeInterface
 {
-    public function applyJob();
+    public function applyJob(): bool
+    {
+        return true;
+    }
     
-    public function salary();
+    public function salary(): int
+    {
+        return 200;
+    }
 }
